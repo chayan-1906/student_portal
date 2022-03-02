@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "795745933030",
+    "project_id": "student-portal-chayan19062000",
+    "storage_bucket": "student-portal-chayan19062000.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795745933030:android:a28241eee28d23be218d27",
+        "android_client_info": {
+          "package_name": "com.example.student_portal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "795745933030-fq2frdcmis8r1dfd36eg4mcp3ah19isc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuZ5wowsGqrd9oM3ak2HCzVVPJv8PZvdY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "795745933030-fq2frdcmis8r1dfd36eg4mcp3ah19isc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
