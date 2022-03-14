@@ -2,12 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_page_transition/flutter_page_transition.dart';
 import 'package:student_portal/models/school_model.dart';
+import 'package:student_portal/screens/add_class_screen.dart';
+import 'package:student_portal/screens/view_classes_screen.dart';
 
 import '../components/loading_spinkit_wave.dart';
 import '../services/color_themes.dart';
 import '../widgets/user_details.dart';
-import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -70,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: Theme.of(context)
                               .appBarTheme
                               .titleTextStyle
-                              .copyWith(fontSize: 30.0),
+                              .copyWith(fontSize: width * 0.08),
                         ),
                       ],
                     ),
@@ -104,12 +107,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
+
+            /// settings
             Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.symmetric(horizontal: width * 0.03),
               child: TextButton.icon(
                 onPressed: () {
                   // TODO" Navigate to Settings Screen
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Settings')));
                 },
                 icon: Icon(Icons.settings_rounded, color: Colors.black),
                 label: Text(
@@ -118,12 +126,82 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            ListTile(
-              title: const Text('Item 2'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
+
+            /// help
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+              child: TextButton.icon(
+                onPressed: () {
+                  // TODO" Navigate to Help Screen
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Help')));
+                },
+                icon: Icon(Icons.help, color: Colors.black),
+                label: Text(
+                  'Help',
+                  style: TextStyle(fontSize: width * 0.05, color: Colors.black),
+                ),
+              ),
+            ),
+
+            /// about
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+              child: TextButton.icon(
+                onPressed: () {
+                  // TODO" Navigate to About Us Screen
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('About Us')));
+                },
+                icon: Icon(Icons.info_rounded, color: Colors.black),
+                label: Text(
+                  'About',
+                  style: TextStyle(fontSize: width * 0.05, color: Colors.black),
+                ),
+              ),
+            ),
+            Divider(color: Colors.grey.shade400, thickness: 1.0),
+
+            /// rate us
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+              child: TextButton.icon(
+                onPressed: () {
+                  // TODO" Navigate to Rate Us Screen
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Rate Us')));
+                },
+                icon: Icon(Icons.star_rate_rounded, color: Colors.black),
+                label: Text(
+                  'Rate Us',
+                  style: TextStyle(fontSize: width * 0.05, color: Colors.black),
+                ),
+              ),
+            ),
+
+            /// contact us
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+              child: TextButton.icon(
+                onPressed: () {
+                  // TODO" Navigate to Contact Us Screen
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Contact Us')));
+                },
+                icon: Icon(Icons.email_rounded, color: Colors.black),
+                label: Text(
+                  'Contact Us',
+                  style: TextStyle(fontSize: width * 0.05, color: Colors.black),
+                ),
+              ),
             ),
           ],
         ),
@@ -132,39 +210,107 @@ class _HomeScreenState extends State<HomeScreen> {
           ? LoadingSpinkitWave(color: ColorThemes.primaryColor)
           : Column(
               children: [
-                StreamBuilder<QuerySnapshot>(
-                  stream: _firebaseFirestore.collection('schools').snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Stack(
-                        children: [
-                          Container(),
-
-                          /// shimmers
-                          // Positioned(
-                          //   top: height * 0.02,
-                          //   left: width * 0.03,
-                          //   right: width * 0.03,
-                          //   child: Shimmers(width: width, height: height),
-                          // ),
-                        ],
-                      );
-                    }
-                    final schoolStream = snapshot.data.docs.map((school) {
-                      return SchoolModel.fromDocument(school);
-                    }).where((userItem) {
-                      return (userItem.id == _firebaseAuth.currentUser.uid);
-                    }).toList();
-                    schoolModel = schoolStream[0];
-                    return SchoolDetails(
-                      width: width,
-                      height: height,
-                      schoolModel: schoolModel,
-                    );
-                  },
+                SchoolDetails(
+                  width: width,
+                  height: height,
+                  // schoolModel: schoolModel,
                 ),
-                Center(
-                  child: Text('Home Screen'),
+
+                /// add new class
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            child: AddClassScreen(),
+                            type: PageTransitionType.rippleRightUp,
+                          ),
+                        );
+                      },
+                      child: Card(
+                        elevation: 8.0,
+                        margin: EdgeInsets.symmetric(
+                          vertical: height * 0.02,
+                          horizontal: width * 0.025,
+                        ),
+                        color: ColorThemes.secondaryColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(height * 0.05)),
+                        child: Container(
+                          padding: EdgeInsets.all(width * 0.07),
+                          width: width * 0.94,
+                          height: height * 0.17,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_box_rounded, size: width * 0.10),
+                              SizedBox(width: width * 0.04),
+                              Text(
+                                'Add new Class',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: width * 0.08,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                /// all classes
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            child: ViewClassesScreen(),
+                            type: PageTransitionType.rippleRightUp,
+                          ),
+                        );
+                      },
+                      child: Card(
+                        elevation: 8.0,
+                        margin: EdgeInsets.symmetric(
+                          vertical: height * 0.02,
+                          horizontal: width * 0.025,
+                        ),
+                        color: ColorThemes.secondaryColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(height * 0.05)),
+                        child: Container(
+                          padding: EdgeInsets.all(width * 0.07),
+                          width: width * 0.94,
+                          height: height * 0.16,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                MaterialCommunityIcons.eye,
+                                size: width * 0.10,
+                              ),
+                              SizedBox(width: width * 0.04),
+                              Text(
+                                'All Classes',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: width * 0.08,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

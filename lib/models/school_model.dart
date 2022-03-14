@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:student_portal/models/question_model.dart';
 
 class SchoolModel {
   String authenticatedBy;
@@ -9,6 +10,7 @@ class SchoolModel {
   // String joinedAt;
   String id;
   String school_name;
+  // List questions;
   int studentsCount;
 
   SchoolModel({
@@ -18,6 +20,7 @@ class SchoolModel {
     // this.joinedAt,
     this.id,
     this.school_name,
+    // this.questions,
     this.studentsCount,
   });
 
@@ -29,6 +32,7 @@ class SchoolModel {
       // joinedAt: queryDocumentSnapshot.get('joinedAt'),
       id: queryDocumentSnapshot.get('id'),
       school_name: queryDocumentSnapshot.get('school_name'),
+      // questions: queryDocumentSnapshot.get('questions'),
       studentsCount: queryDocumentSnapshot.get('students_count'),
     );
   }
@@ -41,6 +45,7 @@ class SchoolModel {
       // 'joinedAt': joinedAt,
       'id': id,
       'school_name': school_name,
+      // 'questions': questions,
       'students_count': studentsCount,
     };
   }

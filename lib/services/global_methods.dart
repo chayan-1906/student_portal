@@ -1,9 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_page_transition/flutter_page_transition.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:nanoid/nanoid.dart';
 import 'package:student_portal/screens/home_screen.dart';
+import 'package:student_portal/services/constants.dart';
+import 'package:student_portal/services/school_question_list.dart';
+
+import '../models/class_model.dart';
+import '../models/question_model.dart';
+import '../screens/add_question_screen.dart';
 
 class GlobalMethods {
   static Future<void> customDialog(BuildContext context, String title,
@@ -99,7 +106,7 @@ class GlobalMethods {
                     letterSpacing: 1.1,
                     color: Colors.redAccent,
                     fontWeight: FontWeight.bold,
-                      fontSize: MediaQuery.of(context).size.height * 0.03,
+                    fontSize: MediaQuery.of(context).size.height * 0.03,
                   ),
                 ),
               ),
@@ -258,4 +265,99 @@ class GlobalMethods {
           );
         });
   }
+
+  static String createUniqueID() {
+    String generatedId = customAlphabet(
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', 38);
+    print(generatedId);
+    return generatedId;
+  }
+
+  static Future<void> addNewClass({
+    BuildContext context,
+    String selectedClass,
+    String selectedSec,
+    CollectionReference classesReference,
+  }) async {
+    print('addNewClass called');
+    String generatedId = GlobalMethods.createUniqueID();
+    Timestamp _classCreationTime = Timestamp.now();
+    print('$selectedClass ${selectedSec.split('Section - ')[1]}');
+    await classesReference.doc(generatedId).set(ClassModel(
+          id: generatedId,
+          createdAt: _classCreationTime,
+          class_name: selectedClass,
+          section_name: selectedSec,
+        ).toMap());
+  }
+
+  static Future<void> saveNewQuestion() async {
+    String questionId = GlobalMethods.createUniqueID();
+    List<String> validAnsList = [];
+    if (validAnsController.text != '') {
+      List<String> validAnswers = validAnsController.text.split('\n');
+      print(validAnswers);
+      for (String s in validAnswers) {
+        print('s : $s');
+        if (s.isNotEmpty && s != '' && s != null && s != ' ' && s != '\n') {
+          validAnsList.add(s);
+        }
+      }
+    }
+    QuestionModel questionModel = QuestionModel(
+      questionId: questionId,
+      classImage: '',
+      questionNumber: SchoolQuestionList.schoolQuestions.length,
+      isOptional: !isRequiredQues,
+      question: questionController.text,
+      questionType: questionType,
+      validAnswers: validAnsList,
+    );
+    // SchoolQuestionList.schoolQuestions = [];
+    await Constants.questionsReference
+        .doc(questionId)
+        .set(questionModel.toJson())
+        .then((value) {
+      SchoolQuestionList.schoolQuestions.add(questionModel);
+    });
+  }
+
+  static Future<void> updateListOrder({int oldIndex, int newIndex}) async {
+    /// update the question index
+    print('$oldIndex     $newIndex');
+    String questionId;
+
+    /// get the questionId of newIndex
+    await Constants.questionsReference
+        .where('questionNumber', isEqualTo: newIndex)
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        questionId = doc.get('questionId');
+      });
+    }).then((value) async {
+      /// update the questionNumber of oldIndex
+      await Constants.questionsReference
+          .where('questionNumber', isEqualTo: oldIndex)
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.update({'questionNumber': newIndex});
+        });
+      });
+
+      /// update the questionNumber of newIndex
+      await Constants.questionsReference
+          .where('questionId', isEqualTo: questionId)
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.update({'questionNumber': oldIndex});
+        });
+      });
+    });
+  }
+
+  static updateOldQuestion(
+      String classId, String questionId, Function() refresh) async {}
 }
